@@ -1,75 +1,56 @@
 #### FOR SCHOOL ####
-import windows-curses
-from windows-curses import KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN
-from random import randint
+from turtle import *
+from random import randrange
+from freegames import square, vector
 
-windows-curses.initscr()
-win = windows-curses.newwin(20, 60, 0, 0)
-win.keypad(1)
-windows-curses.noecho()
-windows-curses.curs_set(0)
-win.border(0)
-win.nodelay(1)
+food = vector(0, 0) #starting position of the food (x, y) from center
+snake = [vector(10, 0)] #starting postion of snake each 'block' is 10 pixels
+aim = vector(0, -10) #initial direction, 
 
-key = KEY_RIGHT                                                    # Initializing values
-score = 0
+def change(x, y): #Direction input
+    "Change snake direction."
+    aim.x = x #x = horizontal
+    aim.y = y #y = vertical
 
-snake = [[4,10], [4,9], [4,8]]                                     # Initial snake co-ordinates
-food = [10,20]                                                     # First food co-ordinates
+def inside(head): #make sure snake is in window
+    "Return True if head inside boundaries."
+    return -200 < head.x < 190 and -200 < head.y < 190
 
-win.addch(food[0], food[1], '0')                                   # Prints the food
+def move(): #orients snake
+    "Move snake forward one segment."
+    head = snake[-1].copy() #moves first vector in snkae (the head)
+    head.move(aim) #head moves where aimed 
 
-while key != 27:                                                   # While Esc key is not pressed
-    win.border(0)
-    win.addstr(0, 2, 'Score : ' + str(score) + ' ')                # Printing 'Score' and
-    win.addstr(0, 27, ' SNAKE ')                                   # 'SNAKE' strings
-    win.timeout(150)     # (500 = slow, 5 = FAST! Increases the speed of Snake as its length increases (win.timeout(150 - (len(snake)/5 + len(snake)/10)%120))
-    
-    prevKey = key                                                  # Previous key pressed
-    event = win.getch()
-    key = key if event == -1 else event 
+    if not inside(head) or head in snake: #when head is in snkae or isnt in head 
+        square(head.x, head.y, 9, 'red') #make snake red 
+        update() #kill snake
+        return
 
+    snake.append(head) #add a box from aray to head
 
-    if key == ord(' '):                                            # If SPACE BAR is pressed, wait for another
-        key = -1                                                   # one (Pause/Resume)
-        while key != ord(' '):
-            key = win.getch()
-        key = prevKey
-        continue
+    if head == food: #when snake in food, make now food
+        print('Snake:', len(snake))
+        food.x = randrange(-15, 15) * 10  #creates food randomly in a 10x10 grid. 
+        food.y = randrange(-15, 15) * 10  #^
+    else:
+        snake.pop(0)  #keeps head toghter 
 
-    if key not in [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, 27]:     # If an invalid key is pressed
-        key = prevKey
+    clear()
 
-    # Calculates the new coordinates of the head of the snake. NOTE: len(snake) increases.
-    # This is taken care of later at [1].
-    snake.insert(0, [snake[0][0] + (key == KEY_DOWN and 1) + (key == KEY_UP and -1), snake[0][1] + (key == KEY_LEFT and -1) + (key == KEY_RIGHT and 1)])
+    for body in snake:
+        square(body.x, body.y, 9, 'black') #aquare(type.x, tpye.y, size, 'color')
 
-    # If snake crosses the boundaries, make it enter from the other side
-    if snake[0][0] == 0: break
-    if snake[0][1] == 0: break
-    if snake[0][0] == 19: break
-    if snake[0][1] == 59: break
+    square(food.x, food.y, 9, 'green')      #^^
+    update()
+    ontimer(move, 100) #on timer (move, amount) (large# - slow, small# -fast)
 
-
-    # Exit if snake crosses the boundaries (Uncomment to enable)
-    #if snake[0][0] == 0 or snake[0][0] == 19 or snake[0][1] == 0 or snake[0][1] == 59: break
-
-    # If snake runs over itself
-    if snake[0] in snake[1:]: break
-
-    
-    if snake[0] == food:                                            # When snake eats the food
-        food = []
-        score += 1
-        while food == []:                                           # Calculating next food's coordinates
-            food = [randint(1, 18), randint(1, 58)]                 # Creating Radom cordanates for next food
-            if food in snake: food = []
-        win.addch(food[0], food[1], '0')                            #Creates next food, not in snake
-    else:    
-        last = snake.pop()                                          # [1] If it does not eat the food, length decreases
-        win.addch(last[0], last[1], ' ')
-    win.addch(snake[0][0], snake[0][1], '#')
-    
-windows-curses.endwin()
-print("\nScore - " + str(score))
-print("http://bitemelater.in\n")
+setup(420, 420, 370, 0) #(width, height, ?, ?)
+hideturtle()  #Hides turtle
+tracer(False) #Hides turtle drawing
+listen()
+onkey(lambda: change(10, 0), 'Right') #Establishes right and left
+onkey(lambda: change(-10, 0), 'Left') #^
+onkey(lambda: change(0, 10), 'Up')    #Establishes up and down
+onkey(lambda: change(0, -10), 'Down') #^
+move()
+done()
