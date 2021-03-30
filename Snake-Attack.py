@@ -1,3 +1,5 @@
+#pip install arcade
+#
 #### FOR SCHOOL ####
 from turtle import *
 from random import randrange
@@ -23,7 +25,7 @@ def move(): #orients snake
 
     if not inside(head) or head in snake: #when head is in snkae or isnt in head 
         square(head.x, head.y, 9, 'red') #make snake red 
-        update() #kill snake
+        #update() #kill snake
         return
 
     snake.append(head) #add a box from aray to head
@@ -41,15 +43,15 @@ def move(): #orients snake
         square(body.x, body.y, 9, 'black') #aquare(type.x, tpye.y, size, 'color')
 
     square(food.x, food.y, 9, 'green')      #^^
-    update()
+    #update()
     ontimer(move, 100) #on timer (move, amount) (large# - slow, small# -fast)
-
+ 
 setup(420, 420, 370, 0) #(width, height, ?, ?)
 hideturtle()  #Hides turtle
 tracer(False) #Hides turtle drawing
 listen()
-onkey(lambda: change(10, 0), 'Right') #Establishes right and left
-onkey(lambda: change(-10, 0), 'Left') #^
+turtel.onkey(lambda: change(10, 0), 'Right') #Establishes right and left
+turtle.onkey(lambda: change(-10, 0), 'Left') #^
 onkey(lambda: change(0, 10), 'Up')    #Establishes up and down
 onkey(lambda: change(0, -10), 'Down') #^
 move()
